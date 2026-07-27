@@ -1,0 +1,99 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>network-map – local preview</title>
+<link rel="stylesheet" href="network-map.css">
+<style>
+  body { margin: 0; padding: 28px; font-family: Inter, Roboto, "Segoe UI", Arial, sans-serif;
+         background: #fff; color: #0f172a; }
+  body.theme--dark { background: #0b1018; color: #e8eef7; }
+  .wrap { max-width: 1180px; margin: 0 auto; }
+  h1 { font-size: 19px; }
+  .toggle { position: fixed; top: 12px; right: 12px; z-index: 100000; padding: 8px 12px;
+            font: inherit; font-size: 13px; cursor: pointer; border-radius: 8px;
+            border: 1px solid #cbd5e1; background: #fff; }
+</style>
+</head>
+<body>
+<button class="toggle" onclick="document.body.classList.toggle('theme--dark')">Toggle theme</button>
+
+<div class="wrap">
+  <h1>1. Ports labelled on both ends of a link</h1>
+
+<pre class="network-map">
+title "Infrastructure – head office"
+height 700
+
+node internet "Internet"          internet info="1 Gb/s fibre"
+node router   "MikroTik RB5009"   router   ip=192.168.1.1 tag=core note="RouterOS 7.14"
+node firewall "Edge firewall"     firewall ip=192.168.1.2 tag=edge
+node sw01     "Cisco SW-01"       switch   ip=192.168.243.2 tag="rack A" note="48x 1G PoE + 4x SFP+"
+node sw02     "Cisco SW-02"       switch   ip=192.168.243.3 tag="rack B"
+node pve01    "Proxmox PVE-01"    hypervisor ip=192.168.243.10
+node nas01    "NAS server"        nas      ip=192.168.243.20
+node ap01     "UniFi AP-01"       wifi     ip=192.168.243.30
+node ap02     "UniFi AP-02"       wifi     ip=192.168.243.31
+node cam01    "CCTV camera lobby" camera   ip=192.168.66.10
+node nvr01    "NVR recorder"      nvr      ip=192.168.66.2
+node ups01    "UPS APC 3000"      ups      ip=192.168.243.90
+
+internet:"ONT port" -> router:ether1  "WAN"           speed=1G
+router:ether2       -> firewall:WAN   "Edge uplink"   speed=1G
+firewall:LAN1       -> sw01:Gi1/0/1   "Trunk"         vlan=243 speed=10G
+sw01:Gi1/0/48       -> sw02:Gi1/0/48  "Stack uplink"  speed=10G
+sw01:Gi1/0/2        -> pve01:eno1     "Hosts"         vlan=243
+sw01:Gi1/0/3        -> nas01:LAN1     "Storage"       vlan=243 speed=10G
+sw01:Gi1/0/4        -> ap01:eth0      "AP trunk"      vlan=243
+sw02:Gi1/0/4        -> ap02:eth0      "AP trunk"      vlan=243
+sw02:Gi1/0/10       -> cam01:LAN      "CCTV"          vlan=66
+sw02:Gi1/0/11       -> nvr01:LAN1     "CCTV"          vlan=66
+router:ether3       -> sw02:Gi1/0/47  "Backup link"   style=dashed
+ups01:LAN           -> sw01:Gi1/0/24  "Management"    vlan=99
+</pre>
+
+  <h1>2. Legacy positional syntax and error reporting</h1>
+
+<pre class="network-map" data-title="Backwards compatibility">
+node internet "Internet" cloud "Main uplink"
+node router "MikroTik RB5009" router "192.168.1.1"
+node firewall "Edge firewall" firewall "LAN gateway"
+node sw01 "Cisco SW-01" switch "192.168.243.2"
+node pve01 "Proxmox PVE-01" hypervisor "192.168.243.10"
+node cam01 "CCTV camera" camera "192.168.66.10"
+
+link internet router "WAN" "Carrier port" "ether1"
+link router firewall "WAN link" "ether2" "WAN"
+link firewall sw01 "Trunk VLAN 243" "LAN" "Gi10"
+link sw01 pve01 "VLAN 243" "Gi1" "eno1"
+link sw01 cam01 "VLAN 66" "Gi4" "LAN"
+link router sw01 "Trunk VLAN 243" "ether2" "Gi10"
+</pre>
+
+  <h1>3. Horizontal layout, line styles and parallel links</h1>
+
+<pre class="network-map">
+title "DMZ and LAG aggregation"
+direction LR
+height 560
+
+node fw     "UTM firewall"   firewall ip=10.0.0.1
+node sw_a   "Switch rack A"  switch   ip=10.10.0.2 tag="rack A"
+node sw_b   "Switch rack B"  switch   ip=10.10.0.3 tag="rack B"
+node web    "Web server"     server   ip=10.0.9.10
+node backup "Backup storage" storage  ip=10.0.9.90
+
+fw:Gi0/2      -> sw_a:Gi1/0/1  "DMZ trunk" vlan=9 speed=10G
+sw_a:Gi1/0/49 -- sw_b:Gi1/0/49 "LAG1 – member 1" speed=10G
+sw_a:Gi1/0/50 -- sw_b:Gi1/0/50 "LAG1 – member 2" speed=10G
+sw_a:Gi1/0/2  -- web:eno1      "No arrowhead" vlan=9
+web:eno2      -> backup:LAN1   "Nightly replication" style=dashed color=#f59e0b
+</pre>
+</div>
+
+<script src="../vendor/cytoscape.min.js"></script>
+<script src="../vendor/cytoscape-dagre.js"></script>
+<script src="network-map.js"></script>
+</body>
+</html>
