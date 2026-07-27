@@ -23,9 +23,9 @@ preview/pl/   używane przez pl/README.md
 
 * **1240 px wide** — renders in a GitHub README without rescaling.
 * Capture **only the map**, without browser chrome or page background. Easiest
-  route: open `pl/test.html` or `en/test.html`, put the map in fullscreen (last
-  toolbar button) and grab the window.
-* The theme toggle sits in the top-right corner of both test pages.
+  route: put `pl/STRONA-TESTOWA.md` or `en/TEST-PAGE.md` on a wiki page, set the
+  map to fullscreen (last toolbar button) and grab the window.
+* Light and dark shots come from the wiki's own theme switch.
 * Keep the filenames from the table — then neither README needs editing. Add new
   shots as `06-…`, `07-…` and reference them yourself.
 * PNG, and avoid upscaled HiDPI captures: the port labels are small and blur quickly.
@@ -37,9 +37,9 @@ The current shots were generated with headless Chrome
 
 * **Szerokość 1240 px** — dobrze wygląda w README na GitHubie, bez skalowania.
 * Rób zrzut **samej mapy**, bez paska przeglądarki i tła strony. Najprościej:
-  otwórz `pl/test.html`, włącz pełny ekran (ostatni przycisk w pasku narzędzi)
-  i zrób zrzut okna.
-* Motyw ciemny przełącza przycisk w prawym górnym narożniku strony testowej.
+  wstaw `pl/STRONA-TESTOWA.md` na stronę wiki, włącz pełny ekran (ostatni
+  przycisk w pasku narzędzi) i zrób zrzut okna.
+* Jasny i ciemny wariant bierze się z przełącznika motywu w samej wiki.
 * Zachowaj nazwy plików z tabeli — wtedy nie trzeba ruszać żadnego README.
 * Format PNG. Unikaj zrzutów z ekranów HiDPI przeskalowanych w górę — etykiety
   portów są małe i szybko się rozmywają.

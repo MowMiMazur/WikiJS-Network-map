@@ -1,10 +1,11 @@
 # vendor/
 
-Third-party libraries, kept here **only** so that `pl/test.html` and `en/test.html`
-work offline. They are not part of this project and are not covered by its licence.
+Third-party libraries, kept here as a convenience for wikis that cannot reach a
+CDN. They are not part of this project and are not covered by its licence.
 
-**For a real Wiki.js installation, take these from their official sources** — you
-get current releases and security fixes, and the browser can cache them across sites.
+**If your wiki can reach the internet, take these from their official sources** —
+you get current releases and security fixes, and the browser can cache them across
+sites.
 
 | File | Package | Version | Official source |
 |---|---|---|---|

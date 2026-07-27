@@ -85,7 +85,7 @@ z repozytorium GitHub, podając je z poprawnym typem MIME.
 **Head:**
 
 ```html
-<link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/MowMiMazur/WikiJS-Network-map@main/pl/network-map.css">
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/MowMiMazur/WikiJS-Network-map@v1.0.2/pl/network-map.css">
 ```
 
 **Body** (kolejność jest istotna):
@@ -93,10 +93,29 @@ z repozytorium GitHub, podając je z poprawnym typem MIME.
 ```html
 <script src="https://cdn.jsdelivr.net/npm/cytoscape@3.34.0/dist/cytoscape.min.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/cytoscape-dagre@3.0.0/cytoscape-dagre.js"></script>
-<script src="https://cdn.jsdelivr.net/gh/MowMiMazur/WikiJS-Network-map@main/pl/network-map.js"></script>
+<script src="https://cdn.jsdelivr.net/gh/MowMiMazur/WikiJS-Network-map@v1.0.2/pl/network-map.js"></script>
 ```
 
 Wersję angielską wczytasz podmieniając `/pl/` na `/en/`.
+
+#### Wersja w adresie
+
+`@v1.0.2` powyżej przypina konkretne wydanie. Możesz wstawić w to miejsce:
+
+| Adres | Co dostajesz |
+|---|---|
+| `@v1.0.2` | dokładnie to wydanie, na stałe. Zalecane — nic nie zmieni się pod Twoją wiki, dopóki sam nie poprawisz adresu |
+| `@1` | najnowsze `1.x` — poprawki i nowe funkcje przychodzą same, bez zmian łamiących zgodność |
+| `@latest` | najnowsze wydanie w ogóle, także przyszłe `2.x`, które może kiedyś wymagać zmian po Twojej stronie |
+
+`@1` i `@latest` wychodzą z 12-godzinnym cache CDN-u i tygodniowym cache
+przeglądarki, więc świeże wydanie nie pojawia się w tej samej minucie —
+przeglądarka, która ma już plik, trzyma go do końca tego tygodnia. Przypięty
+adres nie ma tego opóźnienia: to inny adres, więc nigdy nie jest niczyim starym
+plikiem.
+
+Co się zmieniło w każdej wersji, opisuje
+[lista wydań](https://github.com/MowMiMazur/WikiJS-Network-map/releases).
 
 **O czym trzeba wiedzieć:**
 
@@ -104,26 +123,15 @@ Wersję angielską wczytasz podmieniając `/pl/` na `/en/`.
   `Content-Type: text/plain` z nagłówkiem `X-Content-Type-Options: nosniff`,
   więc przeglądarka odmawia wykonania ich jako skryptu i arkusza stylów.
   Potrzebny jest CDN, który podmienia typ zawartości — stąd jsDelivr.
-* **`@main` to gałąź**, a jsDelivr trzyma taką odpowiedź w cache do 12 godzin.
-  Zmiana w repozytorium nie pojawi się od razu.
-* **Do produkcji przypnij tag.** Tag i konkretny commit są niezmienne, więc
-  jsDelivr cache’uje je na stałe, a Twoja wiki nie zmieni się nagle sama:
+* **Trzyma się stara wersja** przy `@1` albo `@latest`? Jednorazowe otwarcie
+  tego adresu każe jsDelivrowi pobrać plik na nowo i skraca czekanie o część
+  po stronie CDN-u:
 
   ```
-  https://cdn.jsdelivr.net/gh/MowMiMazur/WikiJS-Network-map@v2.0.0/pl/network-map.js
+  https://purge.jsdelivr.net/gh/MowMiMazur/WikiJS-Network-map@1/pl/network-map.js
   ```
 
-  Wydanie tagu w repozytorium:
-
-  ```bash
-  git tag v2.0.0
-  git push origin v2.0.0
-  ```
-* **Wymuszenie odświeżenia cache** dla gałęzi — wystarczy raz otworzyć w przeglądarce:
-
-  ```
-  https://purge.jsdelivr.net/gh/MowMiMazur/WikiJS-Network-map@main/pl/network-map.js
-  ```
+  Własną przeglądarkę i tak trzeba odświeżyć twardo (`Ctrl` + `F5`).
 * **Wiki w sieci odciętej od internetu** nie wczyta niczego z CDN — użyj wariantu C.
 
 ### Wariant B — GitHub Pages
@@ -172,7 +180,7 @@ i poprawki bezpieczeństwa:
 | cytoscape.js-dagre | [github.com/cytoscape/cytoscape.js-dagre](https://github.com/cytoscape/cytoscape.js-dagre) | `https://cdn.jsdelivr.net/npm/cytoscape-dagre@3.0.0/cytoscape-dagre.js` |
 
 Działają też `unpkg.com` i `cdnjs.cloudflare.com`.
-Kopie w folderze [`../vendor/`](../vendor/) są tylko wygodą na potrzeby testów offline.
+Kopie w folderze [`../vendor/`](../vendor/) są dla wiki bez dostępu do CDN-u.
 
 > **Wymagane wersje:** Cytoscape.js **≥ 3.30** i cytoscape.js-dagre **≥ 3.0**.
 > Ta druga jest istotna: mapa używa opcji `useDagreEdgeControlPoints`, która
@@ -307,7 +315,8 @@ i wpis w `TYPES` (etykieta, ikona, kolor).
   document.querySelector('.nm-root').__nm   // { cy, doc, select, fitView, layout }
   ```
 
-Lokalny podgląd bez wiki: otwórz [test.html](test.html) wprost z pliku.
+[STRONA-TESTOWA.md](STRONA-TESTOWA.md) to gotowa strona przechodząca przez
+wszystkie funkcje — wklej ją do wiki, żeby sprawdzić swoją instalację.
 
 ## Licencja
 
