@@ -272,7 +272,11 @@ The `CFG` object at the top of [network-map.js](network-map.js):
 | Field | Meaning |
 |---|---|
 | `nodeWidth` | device card width |
-| `rankSep`, `nodeSep`, `edgeSep` | layout density |
+| `rankSep`, `nodeSep`, `edgeSep` | layout density for small maps |
+| `autoSpread` | `false` = fixed separations, no spreading on dense maps |
+| `spreadFrom`, `spreadRank`, `spreadNode` | from how many links, and how hard, the map spreads out |
+| `fanFrom`, `fanStep` | extra spreading for a wide fan-out from a single device |
+| `spreadMax` | upper bound on the spreading |
 | `stageHeight` | default map height |
 | `fitMaxZoom` | zoom ceiling when fitting small maps |
 | `wheelStep`, `buttonStep` | zoom speed |

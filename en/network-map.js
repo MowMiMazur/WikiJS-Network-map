@@ -16,6 +16,19 @@
     rankSep: 108,            // must fit two port labels plus a description
     nodeSep: 54,             // within a rank
     edgeSep: 28,             // between edges
+
+    // Spreading out dense maps. Dagre knows nothing about port labels or edge
+    // descriptions, so once there are many links the cards sit so close that a
+    // description has nowhere to land and ends up pushed off to the side of the
+    // map instead of resting on its line.
+    autoSpread: true,        // false = fixed separations, as above
+    spreadFrom: 10,          // spreading starts above this many links
+    spreadRank: 0.10,        // growth of the between-rank gap per link
+    spreadNode: 0.035,       // growth of the within-rank gap
+    fanFrom: 4,              // above this many links on a single device…
+    fanStep: 0.06,           // …its rank is pushed further apart sideways
+    spreadMax: 2.2,          // upper bound on the multiplier
+
     stageHeight: 700,        // px, unless height is given
     fitPadding: 24,
     fitMargin: 30,           // slack for labels sticking out of the cards
@@ -450,19 +463,26 @@
   }
 
 
-  // label position candidates, least deviation from the line first
-  var LABEL_SLOTS = (function () {
+  // Label position candidates. Moving along the line (a) keeps a label on its
+  // own edge; moving sideways (p) tears it off the line and leaves it hanging in
+  // mid-air — so sideways costs far more than travelling along the line.
+  function buildSlots(maxAlong, maxPerp, perpCost) {
     var out = [];
-    for (var a = 0; a <= 2; a++) {
-      for (var p = 0; p <= 3; p++) {
+    for (var a = 0; a <= maxAlong; a++) {
+      for (var p = 0; p <= maxPerp; p++) {
         if (p === 0) out.push({ a: a, p: 0 });
         else { out.push({ a: a, p: p }); out.push({ a: a, p: -p }); }
       }
     }
     return out.sort(function (x, y) {
-      return (Math.abs(x.p) + Math.abs(x.a) * 1.2) - (Math.abs(y.p) + Math.abs(y.a) * 1.2);
+      return (Math.abs(x.a) + Math.abs(x.p) * perpCost) - (Math.abs(y.a) + Math.abs(y.p) * perpCost);
     });
-  })();
+  }
+
+  // a description may step aside as a last resort, a port label never may — cut
+  // loose from its line it no longer says which cable it belongs to
+  var LABEL_SLOTS = buildSlots(3, 2, 2.4);
+  var PORT_SLOTS = buildSlots(5, 0, 1);
 
   function placeLabels(items, obstacles) {
     var taken = obstacles.slice();
@@ -470,18 +490,22 @@
     items.sort(function (a, b) { return b.priority - a.priority; });
 
     items.forEach(function (it) {
-      var dir = it.dir;
-      var perp = { x: -dir.y, y: dir.x };
+      var slide = it.slide || it.dir;
+      var perp = { x: -slide.y, y: slide.x };
+      var slots = it.slots || LABEL_SLOTS;
       // the step scales with the label: on a vertical edge a sideways move
       // has to clear its width, not its height
       var stepPerp = Math.abs(perp.x) * it.w + Math.abs(perp.y) * it.h + 6;
-      var stepAlong = Math.abs(dir.x) * it.w + Math.abs(dir.y) * it.h + 6;
+      var stepAlong = Math.abs(slide.x) * it.w + Math.abs(slide.y) * it.h + 6;
       var placed = null;
 
-      for (var i = 0; i < LABEL_SLOTS.length && !placed; i++) {
-        var s = LABEL_SLOTS[i];
-        var x = it.x + perp.x * stepPerp * s.p + dir.x * stepAlong * s.a;
-        var y = it.y + perp.y * stepPerp * s.p + dir.y * stepAlong * s.a;
+      for (var i = 0; i < slots.length && !placed; i++) {
+        var s = slots[i];
+        // a port label may not travel past the middle of its own line — beyond
+        // that it reads as a port of the device on the other end of the cable
+        if (it.limit && s.a * stepAlong > it.limit) continue;
+        var x = it.x + perp.x * stepPerp * s.p + slide.x * stepAlong * s.a;
+        var y = it.y + perp.y * stepPerp * s.p + slide.y * stepAlong * s.a;
         var r = rectAt(x, y, it.w, it.h, 1.5);
         var hit = false;
         for (var j = 0; j < taken.length; j++) {
@@ -893,12 +917,14 @@
         var edge = l.cy;
         var s = endpointOf(edge, 'source');
         var t = endpointOf(edge, 'target');
+        var m = midOf(edge, s, t);
 
-        if (entry.portA) items.push(portItem(entry.portA, s, view[l.source], 2));
-        if (entry.portB) items.push(portItem(entry.portB, t, view[l.target], 2));
+        // the edge midpoint as a reference: a port label that has to give way
+        // travels into its own line rather than along the tangent of the card
+        if (entry.portA) items.push(portItem(entry.portA, s, view[l.source], m, 2));
+        if (entry.portB) items.push(portItem(entry.portB, t, view[l.target], m, 2));
 
         if (entry.desc) {
-          var m = midOf(edge, s, t);
           var dx = t.x - s.x, dy = t.y - s.y;
           var len = Math.hypot(dx, dy) || 1;
           items.push({
@@ -914,18 +940,28 @@
       placeLabels(items, obstacles);
     }
 
-    function portItem(node, point, ownerView, priority) {
+    function portItem(node, point, ownerView, toward, priority) {
       var center = ownerView.cy.position();
       var dx = point.x - center.x, dy = point.y - center.y;
       var len = Math.hypot(dx, dy) || 1;
+      // "away from the card" — this is what lifts the label off the device border
       var dir = { x: dx / len, y: dy / len };
       var w = node.offsetWidth, h = node.offsetHeight;
       var clear = 7 + (w / 2) * Math.abs(dir.x) + (h / 2) * Math.abs(dir.y);
+
+      // "into the line" — the direction the label escapes a collision along; on
+      // an edge bent into an arc it tracks the curve better than a card radius
+      var slide = dir;
+      var sx = toward ? toward.x - point.x : 0, sy = toward ? toward.y - point.y : 0;
+      var sl = Math.hypot(sx, sy);
+      if (sl > 1) slide = { x: sx / sl, y: sy / sl };
+
       return {
         el: node,
         x: point.x + dir.x * clear,
         y: point.y + dir.y * clear,
-        w: w, h: h, dir: dir, priority: priority
+        w: w, h: h, dir: dir, slide: slide, slots: PORT_SLOTS,
+        limit: Math.max(0, sl - clear), priority: priority
       };
     }
 
@@ -1003,14 +1039,39 @@
 
     var orthogonal = false;
 
+    // How much room to add so descriptions still fit on their lines. The gap
+    // between ranks grows with the number of links (that is where descriptions
+    // and port labels sit); the gap within a rank grows with the widest fan-out
+    // as well — one host with a dozen guests spreads its rank harder than a
+    // regular switch does.
+    function spreadFactors() {
+      if (!CFG.autoSpread) return { rank: 1, node: 1 };
+
+      var deg = Object.create(null), fan = 0;
+      doc.links.forEach(function (l) {
+        deg[l.source] = (deg[l.source] || 0) + 1;
+        deg[l.target] = (deg[l.target] || 0) + 1;
+      });
+      Object.keys(deg).forEach(function (id) { if (deg[id] > fan) fan = deg[id]; });
+
+      var over = Math.max(0, doc.links.length - CFG.spreadFrom);
+      var wide = Math.max(0, fan - CFG.fanFrom);
+
+      return {
+        rank: Math.min(CFG.spreadMax, 1 + over * CFG.spreadRank),
+        node: Math.min(CFG.spreadMax, 1 + over * CFG.spreadNode + wide * CFG.fanStep)
+      };
+    }
+
     function runLayout(fit) {
+      var sp = spreadFactors();
       var opts = {
         name: 'dagre',
         rankDir: direction,
         ranker: 'network-simplex',
-        nodeSep: CFG.nodeSep,
-        edgeSep: CFG.edgeSep,
-        rankSep: CFG.rankSep,
+        nodeSep: Math.round(CFG.nodeSep * sp.node),
+        edgeSep: Math.round(CFG.edgeSep * sp.node),
+        rankSep: Math.round(CFG.rankSep * sp.rank),
         nodeDimensionsIncludeLabels: false,
         animate: false,
         fit: false,
@@ -1024,7 +1085,10 @@
         cy.layout(opts).run();
       } catch (err) {
         console.warn('[network-map] dagre unavailable, falling back to breadthfirst', err);
-        cy.layout({ name: 'breadthfirst', directed: true, spacingFactor: 1.3, animate: false, fit: false }).run();
+        cy.layout({
+          name: 'breadthfirst', directed: true,
+          spacingFactor: 1.3 * sp.node, animate: false, fit: false
+        }).run();
       }
 
       applyRouting();

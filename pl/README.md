@@ -272,7 +272,11 @@ Obiekt `CFG` na początku [network-map.js](network-map.js):
 | Pole | Znaczenie |
 |---|---|
 | `nodeWidth` | szerokość kafla urządzenia |
-| `rankSep`, `nodeSep`, `edgeSep` | gęstość układu |
+| `rankSep`, `nodeSep`, `edgeSep` | gęstość układu małych map |
+| `autoSpread` | `false` = stałe odstępy, bez rozsuwania gęstych map |
+| `spreadFrom`, `spreadRank`, `spreadNode` | od ilu połączeń i jak mocno mapa się rozsuwa |
+| `fanFrom`, `fanStep` | dodatkowe rozsunięcie przy szerokim wachlarzu z jednego urządzenia |
+| `spreadMax` | górny limit rozsunięcia |
 | `stageHeight` | domyślna wysokość mapy |
 | `fitMaxZoom` | maksymalne przybliżenie przy dopasowaniu małych map |
 | `wheelStep`, `buttonStep` | szybkość przybliżania |
