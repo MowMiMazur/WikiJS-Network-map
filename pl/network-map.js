@@ -16,6 +16,18 @@
     rankSep: 108,            // musi pomieścić 2 porty + opis
     nodeSep: 54,             // w obrębie poziomu
     edgeSep: 28,             // między krawędziami
+
+    // Rozsuwanie gęstych map. Dagre nie wie nic o etykietach portów ani opisach
+    // połączeń, więc przy dużej liczbie linii kafle stoją tak blisko, że opis
+    // nie ma gdzie usiąść i ląduje wypchnięty w bok, obok mapy zamiast na linii.
+    autoSpread: true,        // false = stałe odstępy, jak wyżej
+    spreadFrom: 10,          // od tylu połączeń zaczyna się rozsuwanie
+    spreadRank: 0.10,        // przyrost odstępu między poziomami na połączenie
+    spreadNode: 0.035,       // przyrost odstępu w obrębie poziomu
+    fanFrom: 4,              // od tylu połączeń przy jednym urządzeniu…
+    fanStep: 0.06,           // …poziom rozpycha się dodatkowo w bok
+    spreadMax: 2.2,          // górny limit mnożnika
+
     stageHeight: 700,        // px, gdy nie podano height
     fitPadding: 24,
     fitMargin: 30,           // zapas na etykiety poza kaflami
@@ -450,19 +462,26 @@
   }
 
 
-  // kandydaci na pozycję etykiety, od najmniejszego odchylenia od linii
-  var LABEL_SLOTS = (function () {
+  // Kandydaci na pozycję etykiety. Przesunięcie wzdłuż linii (a) trzyma etykietę
+  // na jej własnej krawędzi, przesunięcie w bok (p) odrywa ją od linii i zostawia
+  // wiszącą w powietrzu – dlatego bok kosztuje dużo więcej niż ruch po linii.
+  function buildSlots(maxAlong, maxPerp, perpCost) {
     var out = [];
-    for (var a = 0; a <= 2; a++) {
-      for (var p = 0; p <= 3; p++) {
+    for (var a = 0; a <= maxAlong; a++) {
+      for (var p = 0; p <= maxPerp; p++) {
         if (p === 0) out.push({ a: a, p: 0 });
         else { out.push({ a: a, p: p }); out.push({ a: a, p: -p }); }
       }
     }
     return out.sort(function (x, y) {
-      return (Math.abs(x.p) + Math.abs(x.a) * 1.2) - (Math.abs(y.p) + Math.abs(y.a) * 1.2);
+      return (Math.abs(x.a) + Math.abs(x.p) * perpCost) - (Math.abs(y.a) + Math.abs(y.p) * perpCost);
     });
-  })();
+  }
+
+  // opis może w ostateczności odsunąć się w bok, port nigdy – etykieta portu
+  // oderwana od swojej linii nie mówi już nic o tym, którego kabla dotyczy
+  var LABEL_SLOTS = buildSlots(3, 2, 2.4);
+  var PORT_SLOTS = buildSlots(5, 0, 1);
 
   function placeLabels(items, obstacles) {
     var taken = obstacles.slice();
@@ -470,18 +489,22 @@
     items.sort(function (a, b) { return b.priority - a.priority; });
 
     items.forEach(function (it) {
-      var dir = it.dir;
-      var perp = { x: -dir.y, y: dir.x };
+      var slide = it.slide || it.dir;
+      var perp = { x: -slide.y, y: slide.x };
+      var slots = it.slots || LABEL_SLOTS;
       // krok zależny od rozmiaru etykiety: przy pionowej linii przesunięcie
       // w bok musi pokryć jej szerokość, nie wysokość
       var stepPerp = Math.abs(perp.x) * it.w + Math.abs(perp.y) * it.h + 6;
-      var stepAlong = Math.abs(dir.x) * it.w + Math.abs(dir.y) * it.h + 6;
+      var stepAlong = Math.abs(slide.x) * it.w + Math.abs(slide.y) * it.h + 6;
       var placed = null;
 
-      for (var i = 0; i < LABEL_SLOTS.length && !placed; i++) {
-        var s = LABEL_SLOTS[i];
-        var x = it.x + perp.x * stepPerp * s.p + dir.x * stepAlong * s.a;
-        var y = it.y + perp.y * stepPerp * s.p + dir.y * stepAlong * s.a;
+      for (var i = 0; i < slots.length && !placed; i++) {
+        var s = slots[i];
+        // etykieta portu nie może zawędrować za połowę swojej linii – dalej
+        // wyglądałaby już jak port urządzenia po drugiej stronie kabla
+        if (it.limit && s.a * stepAlong > it.limit) continue;
+        var x = it.x + perp.x * stepPerp * s.p + slide.x * stepAlong * s.a;
+        var y = it.y + perp.y * stepPerp * s.p + slide.y * stepAlong * s.a;
         var r = rectAt(x, y, it.w, it.h, 1.5);
         var hit = false;
         for (var j = 0; j < taken.length; j++) {
@@ -893,12 +916,14 @@
         var edge = l.cy;
         var s = endpointOf(edge, 'source');
         var t = endpointOf(edge, 'target');
+        var m = midOf(edge, s, t);
 
-        if (entry.portA) items.push(portItem(entry.portA, s, view[l.source], 2));
-        if (entry.portB) items.push(portItem(entry.portB, t, view[l.target], 2));
+        // środek krawędzi jako punkt odniesienia: etykieta portu, która musi się
+        // odsunąć, wędruje w głąb swojej linii, a nie po stycznej do kafla
+        if (entry.portA) items.push(portItem(entry.portA, s, view[l.source], m, 2));
+        if (entry.portB) items.push(portItem(entry.portB, t, view[l.target], m, 2));
 
         if (entry.desc) {
-          var m = midOf(edge, s, t);
           var dx = t.x - s.x, dy = t.y - s.y;
           var len = Math.hypot(dx, dy) || 1;
           items.push({
@@ -914,18 +939,28 @@
       placeLabels(items, obstacles);
     }
 
-    function portItem(node, point, ownerView, priority) {
+    function portItem(node, point, ownerView, toward, priority) {
       var center = ownerView.cy.position();
       var dx = point.x - center.x, dy = point.y - center.y;
       var len = Math.hypot(dx, dy) || 1;
+      // kierunek „na zewnątrz kafla” – odsuwa etykietę od krawędzi urządzenia
       var dir = { x: dx / len, y: dy / len };
       var w = node.offsetWidth, h = node.offsetHeight;
       var clear = 7 + (w / 2) * Math.abs(dir.x) + (h / 2) * Math.abs(dir.y);
+
+      // kierunek „w głąb linii” – po nim etykieta ucieka przed kolizją; przy
+      // krawędzi wygiętej w łuk trzyma się jej lepiej niż promień z kafla
+      var slide = dir;
+      var sx = toward ? toward.x - point.x : 0, sy = toward ? toward.y - point.y : 0;
+      var sl = Math.hypot(sx, sy);
+      if (sl > 1) slide = { x: sx / sl, y: sy / sl };
+
       return {
         el: node,
         x: point.x + dir.x * clear,
         y: point.y + dir.y * clear,
-        w: w, h: h, dir: dir, priority: priority
+        w: w, h: h, dir: dir, slide: slide, slots: PORT_SLOTS,
+        limit: Math.max(0, sl - clear), priority: priority
       };
     }
 
@@ -1003,14 +1038,38 @@
 
     var orthogonal = false;
 
+    // Ile miejsca dołożyć, żeby opisy zmieściły się na liniach. Odstęp między
+    // poziomami rośnie z liczbą połączeń (tam siadają opisy i etykiety portów),
+    // a odstęp w obrębie poziomu dodatkowo z najszerszym wachlarzem — jeden host
+    // z kilkunastoma maszynami rozpycha swój poziom mocniej niż zwykły switch.
+    function spreadFactors() {
+      if (!CFG.autoSpread) return { rank: 1, node: 1 };
+
+      var deg = Object.create(null), fan = 0;
+      doc.links.forEach(function (l) {
+        deg[l.source] = (deg[l.source] || 0) + 1;
+        deg[l.target] = (deg[l.target] || 0) + 1;
+      });
+      Object.keys(deg).forEach(function (id) { if (deg[id] > fan) fan = deg[id]; });
+
+      var over = Math.max(0, doc.links.length - CFG.spreadFrom);
+      var wide = Math.max(0, fan - CFG.fanFrom);
+
+      return {
+        rank: Math.min(CFG.spreadMax, 1 + over * CFG.spreadRank),
+        node: Math.min(CFG.spreadMax, 1 + over * CFG.spreadNode + wide * CFG.fanStep)
+      };
+    }
+
     function runLayout(fit) {
+      var sp = spreadFactors();
       var opts = {
         name: 'dagre',
         rankDir: direction,
         ranker: 'network-simplex',
-        nodeSep: CFG.nodeSep,
-        edgeSep: CFG.edgeSep,
-        rankSep: CFG.rankSep,
+        nodeSep: Math.round(CFG.nodeSep * sp.node),
+        edgeSep: Math.round(CFG.edgeSep * sp.node),
+        rankSep: Math.round(CFG.rankSep * sp.rank),
         nodeDimensionsIncludeLabels: false,
         animate: false,
         fit: false,
@@ -1024,7 +1083,10 @@
         cy.layout(opts).run();
       } catch (err) {
         console.warn('[network-map] dagre niedostępny, używam układu breadthfirst', err);
-        cy.layout({ name: 'breadthfirst', directed: true, spacingFactor: 1.3, animate: false, fit: false }).run();
+        cy.layout({
+          name: 'breadthfirst', directed: true,
+          spacingFactor: 1.3 * sp.node, animate: false, fit: false
+        }).run();
       }
 
       applyRouting();
