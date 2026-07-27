@@ -84,7 +84,7 @@ GitHub repository with the correct MIME type.
 **Head:**
 
 ```html
-<link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/MowMiMazur/WikiJS-Network-map@main/en/network-map.css">
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/MowMiMazur/WikiJS-Network-map@v1.0.2/en/network-map.css">
 ```
 
 **Body** (order matters):
@@ -92,10 +92,28 @@ GitHub repository with the correct MIME type.
 ```html
 <script src="https://cdn.jsdelivr.net/npm/cytoscape@3.34.0/dist/cytoscape.min.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/cytoscape-dagre@3.0.0/cytoscape-dagre.js"></script>
-<script src="https://cdn.jsdelivr.net/gh/MowMiMazur/WikiJS-Network-map@main/en/network-map.js"></script>
+<script src="https://cdn.jsdelivr.net/gh/MowMiMazur/WikiJS-Network-map@v1.0.2/en/network-map.js"></script>
 ```
 
 Swap `/en/` for `/pl/` to get the Polish user interface.
+
+#### Version in the address
+
+The `@v1.0.2` above pins the release. Swap it for whichever of these suits you:
+
+| Address | What you get |
+|---|---|
+| `@v1.0.2` | exactly this release, for good. Recommended — nothing changes under your wiki until you edit the address yourself |
+| `@1` | the newest `1.x` — fixes and new features arrive on their own, without breaking changes |
+| `@latest` | the newest release of any kind, a future `2.x` included, so it may one day want changes on your side |
+
+`@1` and `@latest` are served with a 12-hour CDN cache and a week-long browser
+cache, so a fresh release does not land the same minute — a browser that already
+holds the file keeps it until that week is up. A pinned address has no such
+delay: it is a different address, so it is never anyone's old file.
+
+The [releases page](https://github.com/MowMiMazur/WikiJS-Network-map/releases)
+lists what changed in each version.
 
 **Things worth knowing:**
 
@@ -103,26 +121,14 @@ Swap `/en/` for `/pl/` to get the Polish user interface.
   `Content-Type: text/plain` together with `X-Content-Type-Options: nosniff`,
   so the browser refuses to execute them as a script or stylesheet. You need a
   CDN that rewrites the content type — hence jsDelivr.
-* **`@main` is a branch** and jsDelivr caches branch responses for up to 12 hours,
-  so a repository change will not show up immediately.
-* **Pin a tag for production.** Tags and commit SHAs are immutable, so jsDelivr
-  caches them permanently and your wiki will not change under you:
+* **Stuck on an old file** while using `@1` or `@latest`? Opening this once tells
+  jsDelivr to fetch it again, which cuts the CDN half of the wait:
 
   ```
-  https://cdn.jsdelivr.net/gh/MowMiMazur/WikiJS-Network-map@v2.0.0/en/network-map.js
+  https://purge.jsdelivr.net/gh/MowMiMazur/WikiJS-Network-map@1/en/network-map.js
   ```
 
-  Publishing a tag:
-
-  ```bash
-  git tag v2.0.0
-  git push origin v2.0.0
-  ```
-* **Forcing a cache refresh** for a branch — open this once in a browser:
-
-  ```
-  https://purge.jsdelivr.net/gh/MowMiMazur/WikiJS-Network-map@main/en/network-map.js
-  ```
+  Your own browser still needs a hard reload (`Ctrl` + `F5`).
 * **An air-gapped wiki** cannot reach any CDN — use option C.
 
 ### Option B — GitHub Pages
@@ -171,7 +177,7 @@ current releases and security fixes:
 | cytoscape.js-dagre | [github.com/cytoscape/cytoscape.js-dagre](https://github.com/cytoscape/cytoscape.js-dagre) | `https://cdn.jsdelivr.net/npm/cytoscape-dagre@3.0.0/cytoscape-dagre.js` |
 
 `unpkg.com` and `cdnjs.cloudflare.com` serve both packages as well.
-The copies in [`../vendor/`](../vendor/) exist only for convenient offline testing.
+The copies in [`../vendor/`](../vendor/) are there for wikis with no route to a CDN.
 
 > **Required versions:** Cytoscape.js **≥ 3.30** and cytoscape.js-dagre **≥ 3.0**.
 > The second one matters: the map relies on the `useDagreEdgeControlPoints`
@@ -306,7 +312,8 @@ A new device type takes two edits: an SVG path in `ICONS` and an entry in `TYPES
   document.querySelector('.nm-root').__nm   // { cy, doc, select, fitView, layout }
   ```
 
-For a local preview without a wiki, open [test.html](test.html) straight from disk.
+[TEST-PAGE.md](TEST-PAGE.md) is a ready page that exercises every feature — paste
+it into a wiki page to check your installation.
 
 ## Licence
 

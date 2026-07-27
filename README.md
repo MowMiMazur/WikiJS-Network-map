@@ -3,6 +3,9 @@
 Interactive network infrastructure diagrams for [Wiki.js](https://js.wiki), written
 as plain text inside the page — including the port on **both** ends of every cable.
 
+Interaktywne mapy infrastruktury sieciowej dla [Wiki.js](https://js.wiki), opisywane
+zwykłym tekstem wewnątrz strony — razem z portem po **obu** stronach kabla.
+
 ![Network map](preview/en/01-map-light.png)
 
 ```html
@@ -14,53 +17,67 @@ router:ether1 -> sw01:Gi1/0/48 "Uplink" vlan=243 speed=10G
 </pre>
 ```
 
-🇬🇧 **[English](#english)** · 🇵🇱 **[Polski](#polski)**
+| | | |
+|---|---|---|
+| 🇬🇧 | **[English ↓](#english)** | [full documentation](en/README.md) · [syntax reference](en/SYNTAX.md) · [test page](en/TEST-PAGE.md) |
+| 🇵🇱 | **[Polski ↓](#polski)** | [pełna dokumentacja](pl/README.md) · [opis składni](pl/SKLADNIA.md) · [strona testowa](pl/STRONA-TESTOWA.md) |
+
+```
+en/       English build: network-map.js, network-map.css, documentation
+pl/       wersja polska: network-map.js, network-map.css, dokumentacja
+preview/  screenshots · zrzuty ekranu
+vendor/   Cytoscape.js + cytoscape-dagre · for wikis with no CDN access
+```
+
+<br>
 
 ---
 
+<br>
+
 # English
 
-## Documentation
+Both language folders hold a complete, standalone copy of the script. The only
+difference is the language of the interface, the messages and the comments — load
+the one you want and ignore the other.
 
-| | |
-|---|---|
-| 🇬🇧 **[English](en/README.md)** | installation, syntax, configuration · [syntax reference](en/SYNTAX.md) · [test page](en/TEST-PAGE.md) |
-| 🇵🇱 **[Polski](pl/README.md)** | instalacja, składnia, konfiguracja · [opis składni](pl/SKLADNIA.md) · [strona testowa](pl/STRONA-TESTOWA.md) |
+## Install
 
-Both folders contain a complete, standalone copy of the script — the only
-difference is the language of the user interface, the messages and the comments.
-Load the one you want and ignore the other.
-
-## Repository layout
-
-```
-en/       English build: network-map.js, network-map.css, docs, local preview
-pl/       Polish build:  network-map.js, network-map.css, docs, local preview
-preview/  screenshots used in the documentation
-vendor/   Cytoscape.js + cytoscape-dagre copies for offline testing only
-```
-
-## Quick install (jsDelivr, straight from GitHub)
-
-**Administration → Theme → Code injection → Head:**
+Everything happens in **Administration → Theme → Code injection**.
 
 ```html
-<link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/MowMiMazur/WikiJS-Network-map@main/en/network-map.css">
+<!-- Head -->
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/MowMiMazur/WikiJS-Network-map@v1.0.2/en/network-map.css">
 ```
 
-**…→ Body:**
-
 ```html
+<!-- Body -->
 <script src="https://cdn.jsdelivr.net/npm/cytoscape@3.34.0/dist/cytoscape.min.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/cytoscape-dagre@3.0.0/cytoscape-dagre.js"></script>
-<script src="https://cdn.jsdelivr.net/gh/MowMiMazur/WikiJS-Network-map@main/en/network-map.js"></script>
+<script src="https://cdn.jsdelivr.net/gh/MowMiMazur/WikiJS-Network-map@v1.0.2/en/network-map.js"></script>
 ```
 
-Use `/pl/` instead of `/en/` for the Polish interface. Note that
-`raw.githubusercontent.com` cannot be used for this — it serves `text/plain` with
+Use `/pl/` instead of `/en/` for the Polish interface. That is the whole
+installation — drop a `<pre class="network-map">…</pre>` block into any wiki page
+and the map draws itself.
+
+### Version in the address
+
+| Address | What you get |
+|---|---|
+| `@v1.0.2` | exactly this release, for good — nothing changes under your wiki until you edit the address |
+| `@1` | the newest `1.x`, arriving on its own, without breaking changes |
+| `@latest` | the newest release of any kind, a future `2.x` included |
+
+`@1` and `@latest` trail a new release by up to a day of CDN and browser caching;
+a pinned address has no such delay, because it is a different address.
+[Releases](https://github.com/MowMiMazur/WikiJS-Network-map/releases) lists what
+each version changed.
+
+`raw.githubusercontent.com` will not work here — it serves `text/plain` with
 `nosniff`, so browsers refuse to execute the files. Cytoscape should always come
-from its own official releases. Details, tag pinning, GitHub Pages and
-self-hosted setups are covered in the language-specific READMEs.
+from its own official releases. GitHub Pages and self-hosted setups are covered in
+the [English README](en/README.md).
 
 ## Requirements
 
@@ -82,54 +99,55 @@ Copyright 2026 Mateusz Mazur (MAZNET)
 Cytoscape.js and cytoscape.js-dagre are MIT licensed and remain the property of
 their respective authors.
 
+<br>
+
 ---
+
+<br>
 
 # Polski
 
-Interaktywne mapy infrastruktury sieciowej dla [Wiki.js](https://js.wiki), opisywane
-zwykłym tekstem wewnątrz strony — razem z portem po **obu** stronach kabla.
-
-## Dokumentacja
-
-| | |
-|---|---|
-| 🇵🇱 **[Polski](pl/README.md)** | instalacja, składnia, konfiguracja · [opis składni](pl/SKLADNIA.md) · [strona testowa](pl/STRONA-TESTOWA.md) |
-| 🇬🇧 **[English](en/README.md)** | installation, syntax, configuration · [syntax reference](en/SYNTAX.md) · [test page](en/TEST-PAGE.md) |
-
-Oba foldery zawierają kompletną, samodzielną kopię skryptu — różnią się tylko
-językiem interfejsu, komunikatów i komentarzy. Wczytujesz ten, który Cię
+Oba foldery językowe zawierają kompletną, samodzielną kopię skryptu. Różnią się
+tylko językiem interfejsu, komunikatów i komentarzy — wczytujesz ten, który Cię
 interesuje, drugi możesz zignorować.
 
-## Zawartość repozytorium
+## Instalacja
 
-```
-en/       wersja angielska: network-map.js, network-map.css, dokumentacja, podgląd lokalny
-pl/       wersja polska:    network-map.js, network-map.css, dokumentacja, podgląd lokalny
-preview/  zrzuty ekranu używane w dokumentacji
-vendor/   kopie Cytoscape.js + cytoscape-dagre wyłącznie do testów offline
-```
-
-## Szybka instalacja (jsDelivr, prosto z GitHuba)
-
-**Administracja → Wygląd → Wstrzykiwanie kodu → Head:**
+Wszystko odbywa się w **Administracja → Wygląd → Wstrzykiwanie kodu**.
 
 ```html
-<link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/MowMiMazur/WikiJS-Network-map@main/pl/network-map.css">
+<!-- Head -->
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/MowMiMazur/WikiJS-Network-map@v1.0.2/pl/network-map.css">
 ```
 
-**…→ Body:**
-
 ```html
+<!-- Body -->
 <script src="https://cdn.jsdelivr.net/npm/cytoscape@3.34.0/dist/cytoscape.min.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/cytoscape-dagre@3.0.0/cytoscape-dagre.js"></script>
-<script src="https://cdn.jsdelivr.net/gh/MowMiMazur/WikiJS-Network-map@main/pl/network-map.js"></script>
+<script src="https://cdn.jsdelivr.net/gh/MowMiMazur/WikiJS-Network-map@v1.0.2/pl/network-map.js"></script>
 ```
 
-Dla interfejsu angielskiego użyj `/en/` zamiast `/pl/`. Uwaga: nie da się tu użyć
-`raw.githubusercontent.com` — serwuje pliki jako `text/plain` z `nosniff`, więc
-przeglądarka odmawia ich wykonania. Cytoscape zawsze bierz z jego oficjalnych
-wydań. Szczegóły, przypinanie do tagu, GitHub Pages i hosting na własnym serwerze
-opisują README poszczególnych wersji językowych.
+Dla interfejsu angielskiego użyj `/en/` zamiast `/pl/`. To cała instalacja —
+wstawiasz na stronie wiki blok `<pre class="network-map">…</pre>` i mapa rysuje
+się sama.
+
+### Wersja w adresie
+
+| Adres | Co dostajesz |
+|---|---|
+| `@v1.0.2` | dokładnie to wydanie, na stałe — nic nie zmieni się pod Twoją wiki, dopóki sam nie poprawisz adresu |
+| `@1` | najnowsze `1.x`, przychodzi samo, bez zmian łamiących zgodność |
+| `@latest` | najnowsze wydanie w ogóle, także przyszłe `2.x` |
+
+`@1` i `@latest` doganiają nowe wydanie z opóźnieniem do doby, przez cache CDN-u
+i przeglądarki; przypięty adres nie ma tego opóźnienia, bo jest po prostu innym
+adresem. Co się zmieniło w danej wersji, opisuje
+[lista wydań](https://github.com/MowMiMazur/WikiJS-Network-map/releases).
+
+`raw.githubusercontent.com` tu nie zadziała — serwuje pliki jako `text/plain`
+z `nosniff`, więc przeglądarka odmawia ich wykonania. Cytoscape zawsze bierz
+z jego oficjalnych wydań. GitHub Pages i hosting na własnym serwerze opisuje
+[polskie README](pl/README.md).
 
 ## Wymagania
 
