@@ -1,0 +1,9 @@
+# local helper files from testing and screenshots
+_*.html
+_*.js
+_*.txt
+
+# system
+Thumbs.db
+desktop.ini
+.DS_Store

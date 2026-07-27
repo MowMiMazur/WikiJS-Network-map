@@ -1,0 +1,5 @@
+# normalizacja koncow linii w repozytorium / normalize line endings
+* text=auto
+
+# zasoby binarne / binary assets
+*.png binary
