@@ -29,11 +29,12 @@ router:ether1 -> sw01:Gi1/0/48 "Uplink" vlan=243 speed=10G
    * [Wariant B — GitHub Pages](#wariant-b--github-pages)
    * [Wariant C — pliki na własnym serwerze](#wariant-c--pliki-na-własnym-serwerze)
    * [Biblioteki Cytoscape](#biblioteki-cytoscape)
-4. [Składnia](#składnia)
-5. [Obsługa mapy](#obsługa-mapy)
-6. [Konfiguracja skryptu](#konfiguracja-skryptu)
-7. [Jak to działa w środku](#jak-to-działa-w-środku)
-8. [Licencja](#licencja)
+4. [Kreator map](#kreator-map)
+5. [Składnia](#składnia)
+6. [Obsługa mapy](#obsługa-mapy)
+7. [Konfiguracja skryptu](#konfiguracja-skryptu)
+8. [Jak to działa w środku](#jak-to-działa-w-środku)
+9. [Licencja](#licencja)
 
 ---
 
@@ -85,7 +86,7 @@ z repozytorium GitHub, podając je z poprawnym typem MIME.
 **Head:**
 
 ```html
-<link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/MowMiMazur/WikiJS-Network-map@v1.0.2/pl/network-map.css">
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/MowMiMazur/WikiJS-Network-map@v1.0.3/pl/network-map.css">
 ```
 
 **Body** (kolejność jest istotna):
@@ -93,18 +94,18 @@ z repozytorium GitHub, podając je z poprawnym typem MIME.
 ```html
 <script src="https://cdn.jsdelivr.net/npm/cytoscape@3.34.0/dist/cytoscape.min.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/cytoscape-dagre@3.0.0/cytoscape-dagre.js"></script>
-<script src="https://cdn.jsdelivr.net/gh/MowMiMazur/WikiJS-Network-map@v1.0.2/pl/network-map.js"></script>
+<script src="https://cdn.jsdelivr.net/gh/MowMiMazur/WikiJS-Network-map@v1.0.3/pl/network-map.js"></script>
 ```
 
 Wersję angielską wczytasz podmieniając `/pl/` na `/en/`.
 
 #### Wersja w adresie
 
-`@v1.0.2` powyżej przypina konkretne wydanie. Możesz wstawić w to miejsce:
+`@v1.0.3` powyżej przypina konkretne wydanie. Możesz wstawić w to miejsce:
 
 | Adres | Co dostajesz |
 |---|---|
-| `@v1.0.2` | dokładnie to wydanie, na stałe. Zalecane — nic nie zmieni się pod Twoją wiki, dopóki sam nie poprawisz adresu |
+| `@v1.0.3` | dokładnie to wydanie, na stałe. Zalecane — nic nie zmieni się pod Twoją wiki, dopóki sam nie poprawisz adresu |
 | `@1` | najnowsze `1.x` — poprawki i nowe funkcje przychodzą same, bez zmian łamiących zgodność |
 | `@latest` | najnowsze wydanie w ogóle, także przyszłe `2.x`, które może kiedyś wymagać zmian po Twojej stronie |
 
@@ -193,11 +194,55 @@ na inną stronę bez przeładowania (Wiki.js działa jako SPA).
 
 ---
 
+## Kreator map
+
+**[`builder.html`](../builder.html)** pisze składnię za Ciebie. Urządzenia
+i połączenia wpisujesz w formularz, a obok powstaje gotowy blok na stronę wiki —
+odświeżany na bieżąco, w trakcie pisania.
+
+![Kreator map](../preview/pl/06-builder.png)
+
+Pobierz ten plik — surowy, nie stronę GitHuba wokół niego — i otwórz
+w przeglądarce. Nie ma czego instalować: żadnego serwera, budowania ani konta.
+To jeden plik HTML, działa bez internetu i nic z tego, co wpiszesz, nie opuszcza
+przeglądarki. Przełącznik w prawym górnym rogu zmienia cały interfejs między
+**polskim a angielskim** (domyślnie angielski), a wybór jest zapamiętywany —
+podobnie jak motyw jasny/ciemny.
+
+### Co jest w środku
+
+| Panel | Co daje |
+|---|---|
+| **Ustawienia mapy** | tytuł, kierunek układu, wysokość, legenda typów i tabela połączeń, a do tego to, czy wynik ma być owinięty w `<pre class="network-map">` i czy wyrównywać kolumny |
+| **Urządzenia** | jedna karta na urządzenie: identyfikator, nazwa, typ (wszystkie 25, pogrupowane, z ikonami), adres / opis, plakietka, notatka, strona wiki, kolor akcentu. Do tego filtr, zmiana kolejności, powielanie i usuwanie. |
+| **Połączenia** | obie strony wybierane z listy urządzeń, port po każdej z nich, opis, VLAN, przepustowość, styl linii, groty, kolor, notatka — i przycisk zamieniający strony miejscami |
+| **Kod** | gotowy blok z podświetleniem składni, do skopiowania albo pobrania |
+| **Kontrola** | powtórzony identyfikator, połączenie donikąd, urządzenie połączone samo ze sobą, ten sam port w dwóch połączeniach, wysokość poza zakresem — to, co zgłosiłby skrypt, tyle że zanim cokolwiek wkleisz |
+| **Podgląd** | rysuje prawdziwą mapę w oknie, prawdziwym skryptem pobranym z jsDelivr. To jedyna część, która potrzebuje internetu. |
+| **Instalacja** | dwa bloki do wstrzykiwania kodu, te same co w tym README, gotowe do skopiowania |
+
+**Wczytaj** działa w drugą stronę: wklejasz cały blok `<pre class="network-map">`
+albo same linie z jego wnętrza, a każde urządzenie, połączenie i ustawienie
+trafia we właściwe pole. Obieg jest bezstratny, więc kreator nadaje się też do
+poprawiania map, które już wiszą na wiki, nie tylko do pisania nowych.
+
+**Przykład** wypełnia kreator kompletnym przykładem z opisu składni — najszybszy
+sposób, żeby zobaczyć, jak to się składa w całość. Praca w toku siedzi w pamięci
+lokalnej przeglądarki, więc zamknięcie karty jej nie kasuje; czyści ją dopiero
+**Zacznij od nowa**.
+
+Dwie rzeczy warte zapamiętania. Składnia nie ma sposobu na zapisanie cudzysłowu,
+więc `"` wpisany w nazwę albo notatkę zamienia się w `'` — kontrola o tym
+powie. I podgląd zostaje w języku, w którym narysowałeś go pierwszy raz; żeby to
+zmienić, odśwież stronę.
+
+---
+
 ## Składnia
 
 Pełny opis: **[SKLADNIA.md](SKLADNIA.md)** — możesz też wkleić ten plik jako
-stronę pomocy we własnej wiki. Gotowa strona testowa: **[STRONA-TESTOWA.md](STRONA-TESTOWA.md)**.
-Skrót najważniejszych rzeczy:
+stronę pomocy we własnej wiki. Żeby napisać mapę bez wnikania w składnię, otwórz
+**[builder.html](../builder.html)**. Skrót najważniejszych rzeczy:
 
 ### Urządzenia
 
@@ -314,9 +359,6 @@ i wpis w `TYPES` (etykieta, ikona, kolor).
   NetworkMap.parse(document.querySelector('pre.network-map').textContent)
   document.querySelector('.nm-root').__nm   // { cy, doc, select, fitView, layout }
   ```
-
-[STRONA-TESTOWA.md](STRONA-TESTOWA.md) to gotowa strona przechodząca przez
-wszystkie funkcje — wklej ją do wiki, żeby sprawdzić swoją instalację.
 
 ## Licencja
 

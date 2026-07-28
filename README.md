@@ -19,14 +19,15 @@ router:ether1 -> sw01:Gi1/0/48 "Uplink" vlan=243 speed=10G
 
 | | | |
 |---|---|---|
-| 🇬🇧 | **[English ↓](#english)** | [full documentation](en/README.md) · [syntax reference](en/SYNTAX.md) · [test page](en/TEST-PAGE.md) |
-| 🇵🇱 | **[Polski ↓](#polski)** | [pełna dokumentacja](pl/README.md) · [opis składni](pl/SKLADNIA.md) · [strona testowa](pl/STRONA-TESTOWA.md) |
+| 🇬🇧 | **[English ↓](#english)** | [full documentation](en/README.md) · [syntax reference](en/SYNTAX.md) · [map builder](builder.html) |
+| 🇵🇱 | **[Polski ↓](#polski)** | [pełna dokumentacja](pl/README.md) · [opis składni](pl/SKLADNIA.md) · [kreator map](builder.html) |
 
 ```
-en/       English build: network-map.js, network-map.css, documentation
-pl/       wersja polska: network-map.js, network-map.css, dokumentacja
-preview/  screenshots · zrzuty ekranu
-vendor/   Cytoscape.js + cytoscape-dagre · for wikis with no CDN access
+builder.html  form-based map editor, EN/PL · kreator map w formularzu, PL/EN
+en/           English build: network-map.js, network-map.css, documentation
+pl/           wersja polska: network-map.js, network-map.css, dokumentacja
+preview/      screenshots · zrzuty ekranu
+vendor/       Cytoscape.js + cytoscape-dagre · for wikis with no CDN access
 ```
 
 <br>
@@ -47,14 +48,14 @@ Everything happens in **Administration → Theme → Code injection**.
 
 ```html
 <!-- Head -->
-<link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/MowMiMazur/WikiJS-Network-map@v1.0.2/en/network-map.css">
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/MowMiMazur/WikiJS-Network-map@v1.0.3/en/network-map.css">
 ```
 
 ```html
 <!-- Body -->
 <script src="https://cdn.jsdelivr.net/npm/cytoscape@3.34.0/dist/cytoscape.min.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/cytoscape-dagre@3.0.0/cytoscape-dagre.js"></script>
-<script src="https://cdn.jsdelivr.net/gh/MowMiMazur/WikiJS-Network-map@v1.0.2/en/network-map.js"></script>
+<script src="https://cdn.jsdelivr.net/gh/MowMiMazur/WikiJS-Network-map@v1.0.3/en/network-map.js"></script>
 ```
 
 Use `/pl/` instead of `/en/` for the Polish interface. That is the whole
@@ -65,7 +66,7 @@ and the map draws itself.
 
 | Address | What you get |
 |---|---|
-| `@v1.0.2` | exactly this release, for good — nothing changes under your wiki until you edit the address |
+| `@v1.0.3` | exactly this release, for good — nothing changes under your wiki until you edit the address |
 | `@1` | the newest `1.x`, arriving on its own, without breaking changes |
 | `@latest` | the newest release of any kind, a future `2.x` included |
 
@@ -78,6 +79,14 @@ each version changed.
 `nosniff`, so browsers refuse to execute the files. Cytoscape should always come
 from its own official releases. GitHub Pages and self-hosted setups are covered in
 the [English README](en/README.md).
+
+## Map builder
+
+Rather not write the syntax by hand? Download **[builder.html](builder.html)** and
+open it in a browser — a single offline page where you fill devices, metadata and
+links into a form, watch the checks, preview the real map and copy the finished
+block. The interface switches between English and Polish; it can also import a map
+you already have on the wiki. Details: [English README](en/README.md#map-builder).
 
 ## Requirements
 
@@ -117,14 +126,14 @@ Wszystko odbywa się w **Administracja → Wygląd → Wstrzykiwanie kodu**.
 
 ```html
 <!-- Head -->
-<link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/MowMiMazur/WikiJS-Network-map@v1.0.2/pl/network-map.css">
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/MowMiMazur/WikiJS-Network-map@v1.0.3/pl/network-map.css">
 ```
 
 ```html
 <!-- Body -->
 <script src="https://cdn.jsdelivr.net/npm/cytoscape@3.34.0/dist/cytoscape.min.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/cytoscape-dagre@3.0.0/cytoscape-dagre.js"></script>
-<script src="https://cdn.jsdelivr.net/gh/MowMiMazur/WikiJS-Network-map@v1.0.2/pl/network-map.js"></script>
+<script src="https://cdn.jsdelivr.net/gh/MowMiMazur/WikiJS-Network-map@v1.0.3/pl/network-map.js"></script>
 ```
 
 Dla interfejsu angielskiego użyj `/en/` zamiast `/pl/`. To cała instalacja —
@@ -135,7 +144,7 @@ się sama.
 
 | Adres | Co dostajesz |
 |---|---|
-| `@v1.0.2` | dokładnie to wydanie, na stałe — nic nie zmieni się pod Twoją wiki, dopóki sam nie poprawisz adresu |
+| `@v1.0.3` | dokładnie to wydanie, na stałe — nic nie zmieni się pod Twoją wiki, dopóki sam nie poprawisz adresu |
 | `@1` | najnowsze `1.x`, przychodzi samo, bez zmian łamiących zgodność |
 | `@latest` | najnowsze wydanie w ogóle, także przyszłe `2.x` |
 
@@ -148,6 +157,15 @@ adresem. Co się zmieniło w danej wersji, opisuje
 z `nosniff`, więc przeglądarka odmawia ich wykonania. Cytoscape zawsze bierz
 z jego oficjalnych wydań. GitHub Pages i hosting na własnym serwerze opisuje
 [polskie README](pl/README.md).
+
+## Kreator map
+
+Nie chcesz pisać składni ręcznie? Pobierz **[builder.html](builder.html)** i otwórz
+w przeglądarce — jedna strona działająca bez internetu, w której urządzenia,
+metadane i połączenia wpisujesz w formularz, widzisz kontrolę poprawności,
+podgląd prawdziwej mapy i gotowy blok do skopiowania. Interfejs przełącza się
+między polskim a angielskim, potrafi też wczytać mapę, którą już masz na wiki.
+Szczegóły: [polskie README](pl/README.md#kreator-map).
 
 ## Wymagania
 
