@@ -197,4 +197,4 @@ ups01:LAN           -> sw01:Gi1/0/24  "Management"   vlan=99
 ---
 
 Installation and configuration: [README.md](README.md).
-A page that exercises every feature: [TEST-PAGE.md](TEST-PAGE.md).
+A form-based editor for all of the above: [builder.html](../builder.html).

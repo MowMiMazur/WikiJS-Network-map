@@ -29,11 +29,12 @@ router:ether1 -> sw01:Gi1/0/48 "Uplink" vlan=243 speed=10G
    * [Option B — GitHub Pages](#option-b--github-pages)
    * [Option C — self-hosted files](#option-c--self-hosted-files)
    * [Cytoscape libraries](#cytoscape-libraries)
-4. [Syntax](#syntax)
-5. [Using the map](#using-the-map)
-6. [Script configuration](#script-configuration)
-7. [How it works inside](#how-it-works-inside)
-8. [Licence](#licence)
+4. [Map builder](#map-builder)
+5. [Syntax](#syntax)
+6. [Using the map](#using-the-map)
+7. [Script configuration](#script-configuration)
+8. [How it works inside](#how-it-works-inside)
+9. [Licence](#licence)
 
 ---
 
@@ -84,7 +85,7 @@ GitHub repository with the correct MIME type.
 **Head:**
 
 ```html
-<link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/MowMiMazur/WikiJS-Network-map@v1.0.2/en/network-map.css">
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/MowMiMazur/WikiJS-Network-map@v1.0.3/en/network-map.css">
 ```
 
 **Body** (order matters):
@@ -92,18 +93,18 @@ GitHub repository with the correct MIME type.
 ```html
 <script src="https://cdn.jsdelivr.net/npm/cytoscape@3.34.0/dist/cytoscape.min.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/cytoscape-dagre@3.0.0/cytoscape-dagre.js"></script>
-<script src="https://cdn.jsdelivr.net/gh/MowMiMazur/WikiJS-Network-map@v1.0.2/en/network-map.js"></script>
+<script src="https://cdn.jsdelivr.net/gh/MowMiMazur/WikiJS-Network-map@v1.0.3/en/network-map.js"></script>
 ```
 
 Swap `/en/` for `/pl/` to get the Polish user interface.
 
 #### Version in the address
 
-The `@v1.0.2` above pins the release. Swap it for whichever of these suits you:
+The `@v1.0.3` above pins the release. Swap it for whichever of these suits you:
 
 | Address | What you get |
 |---|---|
-| `@v1.0.2` | exactly this release, for good. Recommended — nothing changes under your wiki until you edit the address yourself |
+| `@v1.0.3` | exactly this release, for good. Recommended — nothing changes under your wiki until you edit the address yourself |
 | `@1` | the newest `1.x` — fixes and new features arrive on their own, without breaking changes |
 | `@latest` | the newest release of any kind, a future `2.x` included, so it may one day want changes on your side |
 
@@ -191,11 +192,55 @@ navigation to another page (Wiki.js is a SPA).
 
 ---
 
+## Map builder
+
+**[`builder.html`](../builder.html)** writes the syntax for you. You fill in
+devices and links in a form; the block for the wiki page appears next to it and
+updates as you type.
+
+![Map builder](../preview/en/06-builder.png)
+
+Download the file — the raw one, not the GitHub page around it — and open it in a
+browser. There is nothing to install: no server, no build step, no account. It is
+a single HTML file, it works offline, and nothing you type ever leaves your
+browser. The switch in the top-right corner turns the whole interface between
+**English and Polish** (English is the default) and the choice is remembered, as
+is the light/dark theme.
+
+### What is in it
+
+| Panel | What it gives you |
+|---|---|
+| **Map settings** | title, layout direction, height, the type legend and the link table, plus whether the result comes wrapped in `<pre class="network-map">` and whether the columns are aligned |
+| **Devices** | one card per device: identifier, name, type (all 25, grouped and with their icons), address / info, badge, note, wiki page, accent colour. Filter, reorder, duplicate, delete. |
+| **Links** | both ends picked from the device list, the port on each side, description, VLAN, bandwidth, line style, arrowheads, colour, note — and a button that swaps the ends |
+| **Code** | the finished block, highlighted, with copy and download |
+| **Checks** | duplicate identifiers, a link to nowhere, a device linked to itself, the same port used by two links, a height out of range — what the renderer would report, only before you paste anything |
+| **Preview** | draws the real map in a window using the actual script from jsDelivr. This is the only part that needs an internet connection. |
+| **Install** | the two code-injection blocks from this README, ready to copy |
+
+**Import** loads an existing map back into the form: paste a whole
+`<pre class="network-map">` block or just the lines from inside it, and every
+device, link and setting lands in the right field. The round trip is lossless, so
+the builder edits maps that are already on the wiki, not just new ones.
+
+**Example** fills the editor with the complete example from the syntax reference —
+the quickest way to see how the pieces fit together. Work in progress is kept in
+the browser's local storage, so closing the tab does not lose it; **Start over**
+clears it.
+
+Two things worth knowing. The syntax has no escape for a double quote, so a `"`
+typed into a name or a note becomes `'` — the checks tell you when that happened.
+And the preview keeps the language it was first drawn in; reload the page to
+change it.
+
+---
+
 ## Syntax
 
 Full reference: **[SYNTAX.md](SYNTAX.md)** — you can also paste that file into your
-own wiki as a help page. A ready-made test page: **[TEST-PAGE.md](TEST-PAGE.md)**.
-The essentials:
+own wiki as a help page. To write a map without touching the syntax at all, open
+**[builder.html](../builder.html)**. The essentials:
 
 ### Devices
 
@@ -311,9 +356,6 @@ A new device type takes two edits: an SVG path in `ICONS` and an entry in `TYPES
   NetworkMap.parse(document.querySelector('pre.network-map').textContent)
   document.querySelector('.nm-root').__nm   // { cy, doc, select, fitView, layout }
   ```
-
-[TEST-PAGE.md](TEST-PAGE.md) is a ready page that exercises every feature — paste
-it into a wiki page to check your installation.
 
 ## Licence
 
