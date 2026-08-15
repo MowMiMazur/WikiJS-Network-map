@@ -1,6 +1,6 @@
 # Network infrastructure maps for Wiki.js
 
-*[Wersja polska](../pl/README.md) · [Repository home](../README.md)*
+*[🇵🇱 Wersja polska](../pl/README.md) · [🇬🇧 English](README.md) · [← Repository home](../README.md)*
 
 Interactive network diagrams written as **plain text** inside a Wiki.js page.
 Instead of drawing a diagram in an external tool and uploading a picture, you

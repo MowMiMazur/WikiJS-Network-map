@@ -1,23 +1,54 @@
-Wiki.js Network Map (Mapa infrastruktury sieciowej dla Wiki.js)
+WikiJS Network Map (Mapa infrastruktury sieciowej dla Wiki.js)
 Copyright 2026 Mateusz Mazur (MAZNET)
 
-This product includes software developed by Mateusz Mazur (MAZNET).
+Author / Autor: Mateusz Mazur (MAZNET) — https://maznet.pl
 
-Licensed under the Apache License, Version 2.0 (the "License"); you may not
-use these files except in compliance with the License. You may obtain a copy
-of the License in the LICENSE file distributed with this work or at:
+--------------------------------------------------------------------------------
+EN
+--------------------------------------------------------------------------------
+This product includes software developed by Mateusz Mazur (MAZNET) and is
+licensed under the Apache License, Version 2.0 (see the LICENSE file). You may
+obtain a copy of the License at:
 
     http://www.apache.org/licenses/LICENSE-2.0
 
-If you redistribute this work, or a derivative of it, please keep this NOTICE
-file and the copyright headers in network-map.js and network-map.css intact.
+If you use, modify, or redistribute this software or parts of it, you must
+retain this attribution and preserve the copyright and authorship notices above
+and in the network-map.js and network-map.css headers, as required by section 4
+of the License.
+
+This product bundles third-party software distributed under its own terms; see
+"Third-party components" below.
 
 --------------------------------------------------------------------------------
-Third-party components
+PL
+--------------------------------------------------------------------------------
+Ten produkt zawiera oprogramowanie stworzone przez Mateusza Mazura (MAZNET)
+i jest udostępniany na Licencji Apache w wersji 2.0 (zob. plik LICENSE). Kopię
+Licencji znajdziesz pod adresem:
+
+    http://www.apache.org/licenses/LICENSE-2.0
+
+Jeżeli używasz, modyfikujesz lub rozpowszechniasz to oprogramowanie lub jego
+części, musisz zachować powyższą informację o autorstwie oraz noty o prawach
+autorskich — również te w nagłówkach plików network-map.js i network-map.css —
+zgodnie z sekcją 4 Licencji.
+
+Produkt korzysta z oprogramowania firm trzecich udostępnianego na własnych
+warunkach; zob. „Third-party components" poniżej.
+
+Powyższe tłumaczenie ma charakter wyłącznie informacyjny — wiążąca jest wersja
+angielska Licencji.
+
+--------------------------------------------------------------------------------
+Third-party components / Składniki firm trzecich
 --------------------------------------------------------------------------------
 
 The following components are redistributed for convenience and remain under
 their own licenses. They are NOT covered by the copyright above.
+
+Poniższe składniki są dołączone dla wygody i pozostają na własnych licencjach.
+NIE obejmuje ich powyższa nota o prawach autorskich.
 
   Cytoscape.js (cytoscape.min.js)
     Copyright (c) 2016-2026, The Cytoscape Consortium

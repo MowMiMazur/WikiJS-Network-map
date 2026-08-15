@@ -1,5 +1,7 @@
 # Mapa infrastruktury sieciowej — składnia
 
+*[🇵🇱 Składnia](SKLADNIA.md) · [🇬🇧 Syntax reference](../en/SYNTAX.md) · [← Strona główna repozytorium](../README.md)*
+
 Ten plik możesz wkleić jako stronę pomocy we własnej wiki.
 
 Mapę wstawiasz jednym blokiem HTML. W edytorze Markdown wpisujesz:
