@@ -1,6 +1,6 @@
 # Mapa infrastruktury sieciowej dla Wiki.js
 
-*[English version](../en/README.md) · [Strona główna repozytorium](../README.md)*
+*[🇵🇱 Polski](README.md) · [🇬🇧 English version](../en/README.md) · [← Strona główna repozytorium](../README.md)*
 
 Interaktywne diagramy sieci opisywane **zwykłym tekstem** wewnątrz strony Wiki.js.
 Zamiast rysować schemat w zewnętrznym programie i wrzucać obrazek, opisujesz

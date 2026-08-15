@@ -1,5 +1,7 @@
 # Network infrastructure map — syntax
 
+*[🇵🇱 Opis składni](../pl/SKLADNIA.md) · [🇬🇧 Syntax](SYNTAX.md) · [← Repository home](../README.md)*
+
 You can paste this file into your own wiki as a help page.
 
 A map is one HTML block. In the Markdown editor you write:
